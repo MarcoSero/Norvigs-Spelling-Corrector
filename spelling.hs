@@ -3,6 +3,7 @@ import           Data.List (sortBy)
 import qualified Data.ByteString.Char8 as B
 import qualified Data.Map.Lazy as M
 import qualified Data.Set as S
+import           Data.Ord (comparing)
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 nWords = B.readFile "big.txt" >>= \ws -> return (train (lowerWords (B.unpack ws)))
@@ -24,6 +25,6 @@ choices w ws = (known (S.singleton w) ws) `orNextIfEmpty` (known (edits1 w) ws) 
 
 chooseBest ch ws = chooseBest' (ws `M.intersection` (M.fromList (map (\x -> (x,0)) (S.toList ch))))
   where chooseBest' bestChs = head $ (map fst (sortCandidates bestChs))
-        sortCandidates = (sortBy (\(_,c1)(_,c2) -> c2 `compare` c1)) . M.toList
+        sortCandidates = sortBy (comparing snd) . M.toList
 
 correct w = nWords >>= \ws -> return (chooseBest (choices w ws) ws)
