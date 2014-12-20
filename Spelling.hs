@@ -39,7 +39,7 @@ edits1 w = S.fromList $ deletes ++ transposes ++ replaces ++ inserts
               | (a,b) <- splits, c <- alphabet]
 
 edits2 :: String -> WordSet
-edits2 = S.foldl' S.union S.empty . S.map edits1 . edits1
+edits2 = S.unions . S.toList . S.map edits1 . edits1
 
 knownEdits2 :: String -> TrainingDict -> WordSet
 knownEdits2 w nwords = edits2 w `S.intersection` M.keysSet nwords
