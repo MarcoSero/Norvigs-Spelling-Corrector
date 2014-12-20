@@ -1,4 +1,4 @@
-Norvig's Spelling Corrector [![Build Status](https://secure.travis-ci.org/MarcoSero/Norvigs-Spelling-Corrector)](http://travis-ci.org/MarcoSero/Norvigs-Spelling-Corrector)
+Norvig's Spelling Corrector [![Build Status](https://secure.travis-ci.org/MarcoSero/Norvigs-Spelling-Corrector.svg)](http://travis-ci.org/MarcoSero/Norvigs-Spelling-Corrector)
 =====
 
 A Haskell implementation of Peter Norvig's spelling corrector. Read more [here](http://marcosero.com/blog/norvig-haskell-spelling-corrector/).
