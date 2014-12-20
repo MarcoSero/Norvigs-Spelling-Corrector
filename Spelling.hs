@@ -1,12 +1,12 @@
 module Spelling (TrainingDict, nWords, correct) where
 
-import Paths_Norvigs_Spelling_Corrector (getDataFileName)
-import           Data.Char (toLower, isAlpha)
-import           Data.List (sortBy, foldl')
-import qualified Data.ByteString.Char8 as B
-import qualified Data.Map.Strict as M
-import qualified Data.Set as S
-import           Data.Ord (comparing)
+import qualified Data.ByteString.Char8            as B
+import           Data.Char                        (isAlpha, toLower)
+import           Data.List                        (foldl', sortBy)
+import qualified Data.Map.Strict                  as M
+import           Data.Ord                         (comparing)
+import qualified Data.Set                         as S
+import           Paths_Norvigs_Spelling_Corrector (getDataFileName)
 
 type WordSet = S.Set String
 type TrainingDict = M.Map String Int
