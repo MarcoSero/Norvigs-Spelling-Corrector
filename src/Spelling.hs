@@ -8,46 +8,55 @@ import           Data.Ord                         (comparing)
 import qualified Data.Set                         as S
 import           Paths_Norvigs_Spelling_Corrector (getDataFileName)
 
-type WordSet = S.Set String
-type TrainingDict = M.Map String Int
+type WordSet      = S.Set B.ByteString
+type TrainingDict = M.Map B.ByteString Int
 
 alphabet :: String
-alphabet = ['a' .. 'z']
+alphabet = ['a'..'z']
 
 nWords :: IO TrainingDict
 nWords = do
   ws <- getDataFileName "big.txt" >>= B.readFile
-  return (train . lowerWords . B.unpack $ ws)
+  return $ (train . lowerWords) ws
 
-lowerWords :: String -> [String]
-lowerWords = words . map normalize
-  where normalize c = if isAlpha c then toLower c else ' '
+lowerWords :: B.ByteString -> [B.ByteString]
+lowerWords = B.words . B.map normalize
+  where normalize :: Char -> Char
+        normalize c = if isAlpha c then toLower c else ' '
 
-train :: [String] -> TrainingDict
+train :: [B.ByteString] -> TrainingDict
 train = foldl' (\acc x -> M.insertWith (+) x 1 acc) M.empty
 
-edits1 :: String -> WordSet
+edits1 :: B.ByteString -> WordSet
 edits1 w = S.fromList $ deletes ++ transposes ++ replaces ++ inserts
-  where
-    splits = [ splitAt n w | n <- [0 .. length w - 1] ]
-    deletes = map (\(a, b) -> a ++ tail b) splits
-    transposes = [ a ++ [b1, b0] ++ bs
-                 | (a, b0:b1:bs) <- splits ]
-    replaces = [ as ++ [c] ++ bs
-               | (as, _:bs) <- splits, c <- alphabet]
-    inserts = [ a ++ [c] ++ b
-              | (a,b) <- splits, c <- alphabet]
+  where splits :: [(B.ByteString, B.ByteString)]
+        splits = [ B.splitAt n w | n <- [0 .. B.length w - 1] ]
 
-edits2 :: String -> WordSet
+        deletes :: [B.ByteString]
+        deletes = map (\(a, b) -> B.concat[a, B.tail b]) splits
+
+        transposes :: [B.ByteString]
+        transposes = [ B.concat [a, B.tail b, b, B.drop 2 b]
+                    | (a, b) <- splits ]
+
+        replaces :: [B.ByteString]
+        replaces = [ B.concat [a, B.singleton c, B.tail b]
+                  | (a, b) <- splits, c <- alphabet]
+
+        inserts :: [B.ByteString]
+        inserts = [ B.concat [a, B.singleton c, b]
+                  | (a,b) <- splits, c <- alphabet]
+
+edits2 :: B.ByteString -> WordSet
 edits2 = S.unions . S.toList . S.map edits1 . edits1
 
-knownEdits2 :: String -> TrainingDict -> WordSet
+knownEdits2 :: B.ByteString -> TrainingDict -> WordSet
 knownEdits2 w nwords = edits2 w `S.intersection` M.keysSet nwords
 
 known :: WordSet -> TrainingDict -> WordSet
 known inputSet nwords = inputSet `S.intersection` M.keysSet nwords
 
-choices :: String -> TrainingDict -> WordSet
+choices :: B.ByteString -> TrainingDict -> WordSet
 choices w ws = foldr orNextIfEmpty (S.singleton w)
   [ known (S.singleton w) ws
   , known (edits1 w) ws
@@ -55,12 +64,12 @@ choices w ws = foldr orNextIfEmpty (S.singleton w)
   ]
   where orNextIfEmpty x y = if S.null x then y else x
 
-chooseBest :: WordSet -> TrainingDict -> String
+chooseBest :: WordSet -> TrainingDict -> B.ByteString
 chooseBest ch ws = chooseBest' $
   ws `M.intersection` M.fromList (map (\x -> (x, ())) (S.toList ch))
   where
     chooseBest' bestChs = head (map fst (sortCandidates bestChs))
     sortCandidates = sortBy (comparing snd) . M.toList
 
-correct :: TrainingDict -> String -> String
+correct :: TrainingDict -> B.ByteString -> B.ByteString
 correct ws w = chooseBest (choices w ws) ws

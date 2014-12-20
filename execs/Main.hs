@@ -1,18 +1,20 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import Control.Monad (forever, unless)
-import System.IO (hFlush, stdout)
-import Control.Exception (catch)
-import System.IO.Error (isEOFError)
-import Spelling
+import qualified Data.ByteString.Char8  as B
+import           Control.Monad          (forever, unless)
+import           System.IO              (hFlush, stdout)
+import           Control.Exception      (catch)
+import           System.IO.Error        (isEOFError)
+import qualified Spelling               as Sp
 
-repl :: TrainingDict -> IO ()
+repl :: Sp.TrainingDict -> IO ()
 repl ws = forever $ do
-    putStr "> "
+    B.putStr "> "
     hFlush stdout
-    getLine >>= putStrLn . correct ws
+    B.getLine >>= B.putStrLn . Sp.correct ws
 
 main :: IO ()
 main = do
-  catch (nWords >>= repl) (\e -> unless (isEOFError e) (ioError e))
-  putStrLn ""
+  catch (Sp.nWords >>= repl) (\e -> unless (isEOFError e) (ioError e))
+  B.putStrLn ""
