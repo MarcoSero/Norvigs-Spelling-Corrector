@@ -31,10 +31,10 @@ edits1 w = S.fromList $ deletes ++ transposes ++ replaces ++ inserts
   where
     splits = [ splitAt n w | n <- [0 .. length w - 1] ]
     deletes = map (\(a, b) -> a ++ tail b) splits
-    transposes = [ a ++ [b !! 1] ++ [b !! 0] ++ drop 2 b
-                 | (a,b) <- splits, length (take 2 b) > 1 ]
-    replaces = [ a ++ [c] ++ tail b
-               | (a,b) <- splits, c <- alphabet]
+    transposes = [ a ++ [b1, b0] ++ bs
+                 | (a, b0:b1:bs) <- splits ]
+    replaces = [ as ++ [c] ++ bs
+               | (as, _:bs) <- splits, c <- alphabet]
     inserts = [ a ++ [c] ++ b
               | (a,b) <- splits, c <- alphabet]
 
