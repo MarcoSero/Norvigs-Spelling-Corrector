@@ -1,8 +1,10 @@
+module Main where
+
 import Control.Monad (forever, unless)
 import System.IO (hFlush, stdout)
 import Control.Exception (catch)
 import System.IO.Error (isEOFError)
-import Spelling (TrainingDict, nWords, correct)
+import Spelling
 
 repl :: TrainingDict -> IO ()
 repl ws = forever $ do
