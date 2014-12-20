@@ -13,7 +13,7 @@ After you cloning the repository, go the repository folder and do
 cabal build
 ```
 
-Now you compiled the program. There is an example Prolog file in the "usage" folder. You can run it like this:
+Now you compiled the program. You can run it like this:
 
 ```bash
 ./dist/build/Norvigs-Spelling-Corrector/Norvigs-Spelling-Corrector
