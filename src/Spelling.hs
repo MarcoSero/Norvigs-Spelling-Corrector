@@ -2,10 +2,11 @@ module Spelling (TrainingDict, nWords, correct) where
 
 import qualified Data.ByteString.Char8            as B
 import           Data.Char                        (isAlpha, toLower)
-import           Data.List                        (foldl', sortBy)
+import           Data.List                        (foldl', maximumBy)
 import qualified Data.Map.Strict                  as M
 import           Data.Ord                         (comparing)
 import qualified Data.Set                         as S
+import           Data.Function                    (on)
 import           Paths_Norvigs_Spelling_Corrector (getDataFileName)
 
 type WordSet      = S.Set B.ByteString
@@ -65,11 +66,7 @@ choices w ws = foldr orNextIfEmpty (S.singleton w)
   where orNextIfEmpty x y = if S.null x then y else x
 
 chooseBest :: WordSet -> TrainingDict -> B.ByteString
-chooseBest ch ws = chooseBest' $
-  ws `M.intersection` M.fromList (map (\x -> (x, ())) (S.toList ch))
-  where
-    chooseBest' bestChs = head (map fst (sortCandidates bestChs))
-    sortCandidates = sortBy (comparing snd) . M.toList
+chooseBest ch ws = maximumBy (compare `on` (\w -> M.findWithDefault 0 w ws)) (S.toList ch)
 
 correct :: TrainingDict -> B.ByteString -> B.ByteString
 correct ws w = chooseBest (choices w ws) ws
