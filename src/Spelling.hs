@@ -4,7 +4,6 @@ import qualified Data.ByteString.Char8            as B
 import           Data.Char                        (isAlpha, toLower)
 import           Data.List                        (foldl', maximumBy)
 import qualified Data.Map.Strict                  as M
-import           Data.Ord                         (comparing)
 import qualified Data.Set                         as S
 import           Data.Function                    (on)
 import           Paths_Norvigs_Spelling_Corrector (getDataFileName)
