@@ -6,7 +6,7 @@ homepage:            https://github.com/MarcoSero/Norvigs-Spelling-Corrector
 license:             MIT
 license-file:        LICENSE
 author:              Marco Sero
-maintainer:          sero.marco@gmail.com
+maintainer:          marco@marcosero.com
 -- copyright:
 category:            Text
 build-type:          Simple
